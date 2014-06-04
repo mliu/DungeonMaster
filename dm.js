@@ -1,10 +1,16 @@
 //Vars for simplicity
-var config = require('./config.js')
-var ch = config.channels[0];
-var chListener = 'message#' + config.channels[0];
-var chSay = '#' + config.channels[0];
+console.log("Setting up vars");
+
+var dm = require('./init.js')
+var config = require('./config.js');
+var ch = config.options.channels[0];
+var chListener = 'message' + ch;
 
 //Listen for game start calls
-bot.addListener(chListener, function(from, message){
-  bot.say(chSay, "I'M ALIVE!");
+console.log("Adding game start listeners");
+
+dm.addListener(chListener, function(from, message){
+  dm.say(ch, "I'M ALIVE!");
 });
+
+console.log("Ready for input");

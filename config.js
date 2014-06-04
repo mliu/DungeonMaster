@@ -1,8 +1,13 @@
 // Create the configuration
 var config = {
-  channels: ["#test"],
-  server: "irc.rackspace.com",
-  port: "6697",
+  server: "irc.freenode.net",
   botName: "DungeonMaster",
-  sasl: true
+  options: {
+    channels: ['#dm-test'],
+    port: "6667",
+    sasl: false,
+    floodProtection: false
+  }
 };
+
+module.exports = config;

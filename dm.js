@@ -1,4 +1,5 @@
 //Vars for simplicity
+var config = require('./config.js')
 var ch = config.channels[0];
 var chListener = 'message#' + config.channels[0];
 var chSay = '#' + config.channels[0];

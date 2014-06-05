@@ -17,8 +17,11 @@ module.exports.db = db;
 var api = require('./api.js');
 
 //Route api calls
+//Games
 app.post('/games', api.joinGame);
+//Players
 app.post('/players', api.newPlayer);
+app.post('/players/delete', api.deletePlayer);
 
 //Startup express server
 app.listen(3000);
@@ -30,8 +33,8 @@ dm.once(chListener, function(from, message){
 });
 
 //Adding channel message listener
-dm.addListener(chListener, function(from, message){
-  //Listen for help pm
+dm.addListener('message', function(from, to, message){
+  //Listen for help
   if(message.indexOf('.help') == 0){
     console.log("Generating help for " + from);
     dm.say(from, "Hello! I'm an IRC bot created by Michael Liu to help brave adventurers fight legendary monsters and beasts.");
@@ -61,6 +64,24 @@ dm.addListener(chListener, function(from, message){
     );
   }
 
+  else if(message.indexOf('.delete') == 0){
+    console.log(from + " attempting to delete character");
+    //Make request
+    request.post(
+      path + '/players/delete',
+      { form: { name: from }},
+      function(error, response, body){
+        console.log("response received /players/delete");
+        if(!error && response.statusCode == 200){
+          forEach(body, function(obj){
+            console.log(obj);
+            dm.say(obj.channel, obj.message);
+          });
+        }
+      }
+    );
+  }
+
   //Listen for game start
   else if(!adventure && message.indexOf('.adventure') == 0){
     console.log(from + " is starting a game");
@@ -71,7 +92,7 @@ dm.addListener(chListener, function(from, message){
       function(error, response, body){
         console.log("response received /games");
         if(!error && response.statusCode == 200){
-          forEach(JSON.parse(body), function(obj){
+          forEach(body, function(obj){
             dm.say(obj.channel, obj.message);
           });
         }

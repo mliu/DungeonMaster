@@ -3,7 +3,41 @@ var db = require('./dm.js').db;
 
 //Generate a new character
 exports.newPlayer = function(req, res){
-  res.send("New player response");
+  var name = req.body.name;
+  console.log("Creating new player");
+  db.collection('players', function(err, collection){
+    if(!err){
+      var player = collection.find({ "name": name }).limit(1);
+      player.count(function(err, count){
+        if(count > 0){
+          console.log("Found existing player");
+          return res.send(JSON.stringify([{channel: name, message: "You already have an existing character. If you would like to delete this character please type .delete"}]));
+        }
+      });
+    }
+  });
+};
+
+//Delete a character
+exports.deletePlayer = function(req, res){
+  var name = req.body.name;
+  console.log("finding player");
+  db.collection('players', function(err, collection){
+    if(!err){
+      var player = collection.find({ "name": name });
+      console.log(player);
+      player.count(function(err, count){
+        console.log(count);
+        if(count == null){
+          console.log("No player found");
+          return res.send(JSON.stringify([{channel: name, message: "You don't have a character for your account! Type .generate to make one."}]));
+        } else {
+          collection.remove({ name: name }, true);
+          return res.send(JSON.stringify([{channel: name, message: "Your character has been deleted. Type .generate to make a new one!"}]));
+        }
+      });
+    }
+  });
 };
 
 //Create a new adventure
@@ -23,7 +57,7 @@ exports.joinGame = function(req, res){
               var mostRecentGame = collection.find({}).sort({_id:-1}).limit(1);
               console.log("sending back");
               mostRecentGame.count(function(err, count){
-                if(count > 0){
+                if(count > 0 && mostRecentGame.active){
                   //Insert player into database
                   return res.send(JSON.stringify([{channel: req.body.channel, message: name + "rises for the quest!"}]));
                 } else {

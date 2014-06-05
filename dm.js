@@ -1,7 +1,7 @@
 //Vars for simplicity
 console.log("Setting up vars");
 
-var dm = require('./init.js')
+var dm = require('./init.js').dm;
 var config = require('./config.js');
 var ch = config.options.channels[0];
 var chListener = 'message' + ch;
@@ -29,6 +29,6 @@ dm.addListener(chListener, function(from, message){
   //Listen for joins
   else if(adventure && message.indexOf('.join') > -1){
     console.log(from + " joins");
-    dm.say(ch, from + " rises for the quest! Type .join to do the same.");
+    dm.say(ch, from + " rises for the quest! ");
   }
 });

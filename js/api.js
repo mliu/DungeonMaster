@@ -12,6 +12,8 @@ exports.newPlayer = function(req, res){
         if(count > 0){
           console.log("Found existing player");
           return res.send(JSON.stringify([{channel: name, message: "You already have an existing character. If you would like to delete this character please type .delete"}]));
+        } else {
+          console.log("Creating new player");
         }
       });
     }

@@ -3,6 +3,8 @@
   "version": "0.0.1",
   "dependencies": {
     "irc": "0.x.x",
-    "mongodb": "1.x.x"
+    "mongodb": "1.x.x",
+    "express": "3.x.x",
+    "request": "2.x.x"
   }
 }

@@ -1,6 +1,15 @@
-var irc = require('irc');  
-var config = require('./config.js');
+var irc = require('irc');
+var config = require('./js/config.js');
+var express = require('express');
 var mongo = require('mongodb');
+
+var app = express();
+
+console.log("Setting up express app");
+app.configure(function(){
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+});
 
 console.log("Setting up mongodb");
 var Server = mongo.Server,
@@ -63,4 +72,6 @@ var dm = new irc.Client(config.server, config.botName, config.options);
 console.log("Created, trying to join");
 
 module.exports.dm = dm;
-require('./dm.js');
+module.exports.db = db;
+module.exports.app = app;
+require('./js/dm.js');

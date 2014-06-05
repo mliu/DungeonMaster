@@ -2,6 +2,8 @@
   "name": "DungeonMaster",
   "version": "0.0.1",
   "dependencies": {
-    "irc": "0.x.x"
+    "irc": "0.x.x",
+    "express": "3.x.x",
+    "mongodb": "1.x.x"
   }
 }

@@ -35,11 +35,11 @@ db.open(function(err, db){
       }
     });
 
-    console.log("Connecting to users collection");
-    db.collection('users', {strict:true}, function(err, collection){
+    console.log("Connecting to players collection");
+    db.collection('players', {strict:true}, function(err, collection){
       if(err){
-        console.log("No 'users' collection. Creating empty collection");
-        db.collection('users', function(err, collection){
+        console.log("No 'players' collection. Creating empty collection");
+        db.collection('players', function(err, collection){
           collection.insert([], {safe:true}, function(err, result) {});
         });
       }
@@ -64,10 +64,41 @@ db.open(function(err, db){
         });
       }
     });
+
+    console.log("Routing games and players");
+    db.collection('gpRouting', {strict:true}, function(err, collection){
+      if(err){
+        console.log("No 'gpRouting' collection. Creating empty collection");
+        db.collection('gpRouting', function(err, collection){
+          collection.insert([], {safe:true}, function(err, result) {});
+        });
+      }
+    });
+
+    console.log("Routing players and items");
+    db.collection('piRouting', {strict:true}, function(err, collection){
+      if(err){
+        console.log("No 'piRouting' collection. Creating empty collection");
+        db.collection('piRouting', function(err, collection){
+          collection.insert([], {safe:true}, function(err, result) {});
+        });
+      }
+    });
+
+    console.log("Routing games and monsters");
+    db.collection('gmRouting', {strict:true}, function(err, collection){
+      if(err){
+        console.log("No 'gmRouting' collection. Creating empty collection");
+        db.collection('gmRouting', function(err, collection){
+          collection.insert([], {safe:true}, function(err, result) {});
+        });
+      }
+    });
   }
 });
 
 console.log("Creating bot");
+console.log(config);
 var dm = new irc.Client(config.server, config.botName, config.options);
 console.log("Created, trying to join");
 

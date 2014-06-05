@@ -1,3 +1,5 @@
+require('./func.js');
+
 //Vars for simplicity
 console.log("Setting up vars");
 
@@ -50,8 +52,10 @@ dm.addListener(chListener, function(from, message){
       function(error, response, body){
         console.log("response received /players");
         if(!error && response.statusCode == 200){
-          dm.say(from, body);
-          //Listen for rolls?
+          forEach(body, function(obj){
+            dm.say(obj.channel, obj.message);
+            //Listen for rolls?
+          });
         }
       }
     );
@@ -67,7 +71,9 @@ dm.addListener(chListener, function(from, message){
       function(error, response, body){
         console.log("response received /games");
         if(!error && response.statusCode == 200){
-          dm.say(body.channel, body.message);
+          forEach(JSON.parse(body), function(obj){
+            dm.say(obj.channel, obj.message);
+          });
         }
       }
     );

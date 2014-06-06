@@ -22,6 +22,7 @@ app.post('/games', api.joinGame);
 //Players
 app.post('/players', api.newPlayer);
 app.post('/players/delete', api.deletePlayer);
+app.get('/players/identify', api.playerIdentified);
 
 //Startup express server
 app.listen(3000);
@@ -64,6 +65,8 @@ dm.addListener('message', function(from, to, message){
     );
   }
 
+  //Sensitive functions that need identification to execute
+
   else if(message.indexOf('.delete') == 0){
     console.log(from + " attempting to delete character");
     //Make request
@@ -99,4 +102,5 @@ dm.addListener('message', function(from, to, message){
       }
     );
   }
+
 });

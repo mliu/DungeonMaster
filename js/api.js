@@ -1,25 +1,41 @@
 //Vars
 var db = require('./dm.js').db;
 
+exports.playerIdentified = function(req, res){
+  var name = req.body.name;
+  db.collection('players', function(err, playersColl){
+    var player = playersColl.find({ name: name }).limit(1);
+    player.count(function(err, count){
+      if(count == 0){
+        return res.send(true);
+      } else {
+        player.toArray(function(err, arr){
+          if(arr[0].identified){
+            return res.send(true);
+          } else {
+            return res.send(false);
+          }
+        });
+      }
+    });
+  }
+};
+
 //Generate a new character
 exports.newPlayer = function(req, res){
   var name = req.body.name;
   console.log("Creating new player");
   db.collection('players', function(err, playersColl){
-    var player = playersColl.find({ "name": name }).limit(1);
+    var player = playersColl.find({ name: name }).limit(1);
     player.count(function(err, count){
       if(count > 0){
         console.log("Found existing player");
         return res.send(JSON.stringify([{channel: name, message: "You already have an existing character. If you would like to delete this character please type .delete"}]));
       } else {
         console.log("Creating new player");
-        playersColl.insert({ name: name } , { safe: true } , function(err, obj){
-          if(!err){
-            return res.send(JSON.stringify([{channel: name, message: "Character created for " + name + "! Please choose your character's class:"}]));
-            //Stats? Rolls?
-          } else {
-            console.log("ERROR IN NEWPLAYER INSERT");
-          }
+        playersColl.insert({ name: name }, function(err, obj){
+          return res.send(JSON.stringify([{channel: name, message: "Character created for " + name + "! Please choose your character's class:"}]));
+          //Stats? Rolls?
         });
       }
     });
@@ -31,16 +47,16 @@ exports.deletePlayer = function(req, res){
   var name = req.body.name;
   console.log("finding player");
   db.collection('players', function(err, playersColl){
-    var player = playersColl.find({ "name": name });
-    console.log(player);
-    player.count(function(err, count){
+    playersColl.count({ name: name }, function(err, count){
       console.log(count);
       if(count == 0){
         console.log("No player found");
         return res.send(JSON.stringify([{channel: name, message: "You don't have a character for your account! Type .generate to make one."}]));
       } else {
-        playersColl.remove({ name: name }, true);
-        return res.send(JSON.stringify([{channel: name, message: "Your character has been deleted. Type .generate to make a new one!"}]));
+        console.log("Removing player");
+        playersColl.remove({ name: name }, { justOne: true }, function(err, callback){
+          return res.send(JSON.stringify([{channel: name, message: "Your character has been deleted. Type .generate to make a new one!"}]));
+        });
       }
     });
   });
@@ -51,8 +67,10 @@ exports.joinGame = function(req, res){
   var name = req.body.name;
   console.log("Creating new game");
   db.collection('players', function(err, playersColl){
-    var player = playersColl.find({ "name": name });
-    player.count(function(err, count){
+    var player = playersColl.find({ name: name });
+    console.log(player);
+    playersColl.count({ name: name }, function(err, count){
+      console.log(count);
       if(count > 0){
         //Use player in database
         player.toArray(function(err, arr){
@@ -86,10 +104,11 @@ exports.joinGame = function(req, res){
                 });
               } else {
                 //Create game and
-                gamesColl.insert({ active: true }, { safe: true }, function(err, obj){
+                gamesColl.insert({ active: true }, function(err, obj){
                   //insert player into database
                   db.collection('gpRouting', function(err, gpColl){
-                    gpColl.insert({ player: playerId, game: obj});
+                    console.log(obj._id);
+                    gpColl.insert({ player: playerId, game: obj._id });
                     return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark when 4 more join! Anyone wishing to join type .adventure"}]));
                   });
                 });

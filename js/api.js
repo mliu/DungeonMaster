@@ -5,9 +5,9 @@ var db = require('./dm.js').db;
 exports.newPlayer = function(req, res){
   var name = req.body.name;
   console.log("Creating new player");
-  db.collection('players', function(err, collection){
+  db.collection('players', function(err, playersColl){
     if(!err){
-      var player = collection.find({ "name": name }).limit(1);
+      var player = playersColl.find({ "name": name }).limit(1);
       player.count(function(err, count){
         if(!err){
           if(count > 0){
@@ -15,11 +15,12 @@ exports.newPlayer = function(req, res){
             return res.send(JSON.stringify([{channel: name, message: "You already have an existing character. If you would like to delete this character please type .delete"}]));
           } else {
             console.log("Creating new player");
-            collection.insert({ name: name } , { safe: true } , function(err, obj){
+            playersColl.insert({ name: name } , { safe: true } , function(err, obj){
               if(!err){
-                return res.send(JSON.stringify([{channel: name, message: "Not ready yet"}]));
+                return res.send(JSON.stringify([{channel: name, message: "Character created!"}]));
+                //Stats? Rolls?
               } else {
-                console.log("ERROR IN NEWPLAYER INSERT")
+                console.log("ERROR IN NEWPLAYER INSERT");
               }
             });
           }
@@ -35,18 +36,18 @@ exports.newPlayer = function(req, res){
 exports.deletePlayer = function(req, res){
   var name = req.body.name;
   console.log("finding player");
-  db.collection('players', function(err, collection){
+  db.collection('players', function(err, playersColl){
     if(!err){
-      var player = collection.find({ "name": name });
+      var player = playersColl.find({ "name": name });
       console.log(player);
       player.count(function(err, count){
         if(!err){
           console.log(count);
-          if(count == null){
+          if(count == 0){
             console.log("No player found");
             return res.send(JSON.stringify([{channel: name, message: "You don't have a character for your account! Type .generate to make one."}]));
           } else {
-            collection.remove({ name: name }, true);
+            playersColl.remove({ name: name }, true);
             return res.send(JSON.stringify([{channel: name, message: "Your character has been deleted. Type .generate to make a new one!"}]));
           }
         } else {
@@ -54,7 +55,7 @@ exports.deletePlayer = function(req, res){
         }
       });
     } else {
-      console.log("ERROR IN DELETEPLAYER COLLECTION")
+      console.log("ERROR IN DELETEPLAYER COLLECTION");
     }
   });
 };
@@ -63,36 +64,64 @@ exports.deletePlayer = function(req, res){
 exports.joinGame = function(req, res){
   var name = req.body.name;
   console.log("Creating new game");
-  db.collection('players', function(err, collection){
+  db.collection('players', function(err, playersColl){
     if(!err){
-      var player = collection.find({ "name": name });
+      var player = playersColl.find({ "name": name });
       player.count(function(err, count){
         if(!err){
           if(count > 0){
             //Use player in database
-            var playerId = player.at(0)._id;
-            db.collection('games', function(err, collection){
+            player.toArray(function(err, arr){
               if(!err){
-                console.log("finding game and sorting");
-                var mostRecentGame = collection.sort({_id:-1}).limit(1);
-                console.log("sending back");
-                mostRecentGame.count(function(err, count){
+                playerId = arr[0]._id;
+                db.collection('games', function(err, gamesColl){
                   if(!err){
-                    if(count > 0 && mostRecentGame.active){
-                      //Insert player into database
-                      return res.send(JSON.stringify([{channel: req.body.channel, message: name + "rises for the quest!"}]));
-                    } else {
-                      //Should the players all be their own row in this database
-                      //Or should players have a lot of games?
-                      // collection.insert({gameNumber : 0, player : })
-                      return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark in 5 minutes! Anyone wishing to join type .adventure"}]));
-                    }
+                    console.log("finding game and sorting");
+                    var recentGames = gamesColl.find({}).sort({_id:-1});
+                    recentGames.toArray(function(err, arr){
+                      if(!err){
+                        //If there is an active game waiting for joins
+                        if(arr.length > 0 && arr[0].active){
+                          //Insert player into database
+                          db.collection('gpRouting', function(err, gpColl){
+                            gpColl.count({ player: playerId, game: arr[0]._id }, function(err2, num){
+                              if(num > 0){
+                              console.log(name + " already in adventure");
+                              return res.send(JSON.stringify([{channel: req.body.channel, message: name + " you are already a part of this adventure!"}]));
+                              }
+                              else if(!err){
+                                console.log("adding " + name + " to adventure");
+                                gpColl.insert({ player: playerId, game: arr[0]._id });
+                                return res.send(JSON.stringify([{channel: req.body.channel, message: name + " rises for the adventure!"}]));
+                              } else {
+                                console.log("ERROR IN JOINGAME GPROUTING COLLECTION 1");
+                              }
+                            });
+                          });
+                        } else {
+                          //Create game and
+                          gamesColl.insert({ active: true }, { safe: true }, function(err, obj){
+                            //insert player into database
+                            db.collection('gpRouting', function(err, gpColl){
+                              if(!err){
+                                gpColl.insert({ player: playerId, game: obj});
+                                return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark in 5 minutes! Anyone wishing to join type .adventure"}]));
+                              } else {
+                                console.log("ERROR IN JOINGAME GPROUTING COLLECTION 2");
+                              }
+                            });
+                          });
+                        }
+                      } else {
+                        console.log("ERROR IN JOINGAME GAMECOUNT");
+                      }
+                    });
                   } else {
-                    console.log("ERROR IN JOINGAME GAMECOUNT");
+                    console.log("ERROR IN JOINGAME COLLECTION");
                   }
                 });
               } else {
-                console.log("ERROR IN JOINGAME COLLECTION")
+                console.log("ERROR IN JOINGAME PLAYERS TOARRAY");
               }
             });
           } else {

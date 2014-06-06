@@ -84,7 +84,7 @@ dm.addListener('message', function(from, to, message){
 
   //Listen for game start
   else if(!adventure && message.indexOf('.adventure') == 0){
-    console.log(from + " is starting a game");
+    console.log(from + " is starting/joining a game");
     //Make request
     request.post(
       path + '/games',

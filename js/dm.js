@@ -40,7 +40,7 @@ checkIdentified = function(name, callback){
         if(body == true){
           callback();
         } else {
-          dm.say(from, "Before executing sensitive commands, I need to identify your character first...")
+          dm.say(from, "Before executing sensitive commands, I need to identify " + from + " first...")
           dm.say("nickserv", "acc " + from);
         }
       }

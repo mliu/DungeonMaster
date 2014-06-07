@@ -10,8 +10,9 @@ var app = require('../init.js').app;
 var config = require('./config.js');
 var ch = config.options.channels[0];
 var chListener = 'message' + ch;
-var adventure = false;
 var path = config.host + ":" + config.port;
+var accResponse = ["0", "1", "2"];
+var validMessage = [".delete", ".adventure"];
 //API setup
 module.exports.db = db;
 var api = require('./api.js');
@@ -23,6 +24,7 @@ app.post('/games', api.joinGame);
 app.post('/players', api.newPlayer);
 app.post('/players/delete', api.deletePlayer);
 app.get('/players/identify', api.playerIdentified);
+app.post('/players/identify', api.identifyPlayer);
 
 //Startup express server
 app.listen(3000);
@@ -47,7 +49,7 @@ dm.addListener('message', function(from, to, message){
   }
 
   //Listen for character creation
-  else if(message.indexOf('.generate') == 0){
+  if(message.indexOf('.generate') == 0){
     console.log(from + " attempting to gen. character");
     //Make request
     request.post(
@@ -66,41 +68,77 @@ dm.addListener('message', function(from, to, message){
   }
 
   //Sensitive functions that need identification to execute
-
-  else if(message.indexOf('.delete') == 0){
-    console.log(from + " attempting to delete character");
-    //Make request
-    request.post(
-      path + '/players/delete',
+  else if (validMessage.indexOf(message) > -1){
+    console.log("identifying " + name);
+    request.get(
+      path + '/players/identify',
       { form: { name: from }},
       function(error, response, body){
-        console.log("response received /players/delete");
+        console.log("response received player/identify");
         if(!error && response.statusCode == 200){
-          forEach(body, function(obj){
-            console.log(obj);
-            dm.say(obj.channel, obj.message);
-          });
+          if(body == "true") {
+            //Player identified
+            if(message.indexOf('.delete') == 0){
+              //Make request
+              console.log("deleting " + name);
+              request.post(
+                path + '/players/delete',
+                { form: { name: from }},
+                function(error, response, body){
+                  console.log("response received /players/delete");
+                  if(!error && response.statusCode == 200){
+                    forEach(body, function(obj){
+                      console.log(obj);
+                      dm.say(obj.channel, obj.message);
+                    });
+                  }
+                }
+              );
+            }
+
+            //Listen for game starts
+            else if(message.indexOf('.adventure') == 0){
+              //Make request
+              console.log(name + " join/start adventure")
+              request.post(
+                path + '/games',
+                { form: { name: from, channel: ch }},
+                function(error, response, body){
+                  console.log("response received /games");
+                  if(!error && response.statusCode == 200){
+                    forEach(body, function(obj){
+                      dm.say(obj.channel, obj.message);
+                    });
+                  }
+                }
+              );
+            }
+          } else {
+            dm.say(ch, "Before executing sensitive commands, I need to identify your character first...")
+            dm.say("nickserv", "acc " + from);
+          }
         }
       }
-    );
+    )
   }
 
-  //Listen for game start
-  else if(!adventure && message.indexOf('.adventure') == 0){
-    console.log(from + " is starting/joining a game");
-    //Make request
+});
+
+dm.addListener('notice', function(nick, to, text, message){
+  if(nick == "NickServ" && text[text.length-1] == "3"){
+    //Player is identified
+    console.log("nickserv response");
     request.post(
-      path + '/games',
-      { form: { name: from, channel: ch }},
+      path + '/players/identify',
+      { form: { name: text.substr(0, text.indexOf(" ")) }},
       function(error, response, body){
-        console.log("response received /games");
-        if(!error && response.statusCode == 200){
-          forEach(body, function(obj){
-            dm.say(obj.channel, obj.message);
-          });
-        }
+        console.log("response received /players/identify");
+        forEach(body, function(obj){
+          dm.say(obj.channel, obj.message);
+        });
       }
     );
+  } else if(nick == "NickServ" && accResponse.indexOf(text[text.length-1]) > -1){
+    dm.say(text.substr(0, text.indexOf(" ")), "You are not identified with the Nickserv.");
   }
-
 });

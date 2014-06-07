@@ -42,6 +42,15 @@ db.open(function(err, db){
         db.collection('players', function(err, collection){
           collection.insert([], {safe:true}, function(err, result) {});
         });
+      } else {
+        //Reset identificatin
+        collection.update({}, {$set: { identified: false }}, { multi: true }, function(err){
+          if(err){
+            console.log('Error in mass update of identified');
+          } else {
+            console.log('Resetting all identified');
+          }
+        });
       }
     });
 
@@ -97,7 +106,7 @@ db.open(function(err, db){
   }
 });
 
-console.log("Creating bot");
+console.log("Creating bot with following config:");
 console.log(config);
 var dm = new irc.Client(config.server, config.botName, config.options);
 console.log("Created, trying to join");

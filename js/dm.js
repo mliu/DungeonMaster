@@ -12,6 +12,7 @@ var ch = config.options.channels[0];
 var chListener = 'message' + ch;
 var path = config.host + ":" + config.port;
 var accResponse = ["0", "1", "2"];
+var chooseResponse = ["1", "2", "3", "4"];
 //API setup
 module.exports.db = db;
 var api = require('./api.js');
@@ -24,6 +25,7 @@ app.post('/players', api.newPlayer);
 app.post('/players/delete', api.deletePlayer);
 app.get('/players/identify', api.playerIdentified);
 app.post('/players/identify', api.identifyPlayer);
+app.post('/players/choose', api.choosePlayerClass);
 
 //Startup express server
 app.listen(3000);
@@ -31,17 +33,17 @@ console.log('Listening on port 3000');
 
 //Identifying function
 checkIdentified = function(name, callback){
-  console.log("identifying " + from);
+  console.log("identifying " + name);
   request.get(
     path + '/players/identify',
-    { form: { name: from }},
+    { form: { name: name }},
     function(error, response, body){
       if(!error && response.statusCode == 200){
-        if(body == true){
+        if(body == "true"){
           callback();
         } else {
-          dm.say(from, "Before executing sensitive commands, I need to identify " + from + " first...")
-          dm.say("nickserv", "acc " + from);
+          dm.say(name, "Before executing sensitive commands, I need to identify " + name + " first...")
+          dm.say("nickserv", "acc " + name);
         }
       }
     }
@@ -67,9 +69,8 @@ dm.addListener('message', function(from, to, message){
   }
 
   //Listen for character creation
-  if(message.indexOf('.generate') == 0){
+  else if(message.indexOf('.generate') == 0){
     console.log(from + " attempting to gen. character");
-    //Make request
     request.post(
       path + '/players',
       { form: { name: from }},
@@ -78,18 +79,36 @@ dm.addListener('message', function(from, to, message){
         if(!error && response.statusCode == 200){
           forEach(body, function(obj){
             dm.say(obj.channel, obj.message);
-            //Listen for rolls?
           });
         }
       }
     );
   }
 
+  //Choose player class
+  else if(message.indexOf('.choose ') == 0){
+    checkIdentified(from, function(){
+      if(chooseResponse.indexOf(message[message.length-1]) > -1){
+        request.post(
+          path + '/players/choose',
+          { form: { name: from, clazz: message[message.length-1] }},
+          function(error, response, body){
+            console.log("response received /players/choose");
+            if(!error && response.statusCode == 200){
+              forEach(body, function(obj){
+                dm.say(obj.channel, obj.message);
+              });
+            }
+          }
+        );
+      }
+    });
+  }
+
   //Sensitive functions that need identification to execute
   //Listen for delete character
   else if(message.indexOf('.delete') == 0){
     checkIdentified(from, function(){
-      //Make request
       console.log("deleting " + from);
       request.post(
         path + '/players/delete',
@@ -110,7 +129,6 @@ dm.addListener('message', function(from, to, message){
   //Listen for game starts
   else if(to == ch && message.indexOf('.adventure') == 0){
     checkIdentified(from, function(){
-      //Make request
       console.log(from + " join/start adventure")
       request.post(
         path + '/games',

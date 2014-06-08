@@ -44,9 +44,42 @@ exports.newPlayer = function(req, res){
     } else {
       console.log("Creating new player");
       playersColl.insert({ name: name, identified: false, ready: false }, {w: 1}, function(err, obj){
-        return res.send(JSON.stringify([{channel: name, message: "Character created for " + name + "! Please choose your character's class:"}]));
-        //Stats? Rolls?
+        return res.send(JSON.stringify([{channel: name, message: "Character created for " + name + "! Please choose your character's class: 1: Warrior, 2: Archer, 3: Mage, 4: Cleric, 5: Rogue (e.g. '.choose 3')"}]));
       });
+    }
+  });
+};
+
+//Choose player class
+exports.choosePlayerClass = function(req, res){
+  var name = req.body.name;
+  var clazz = req.body.clazz;
+  var playersColl = db.collection('players');
+  playersColl.find({ name: name }).limit(1).toArray(function(err, arr){
+    if(arr.length == 0){
+      return res.send(JSON.stringify([{channel: name, message: "No character found!"}]));
+    }
+    else if(arr[0].ready == false) {
+      switch(clazz){
+        case: "1":
+          playersColl.update({ name: name }, {$set: { ready: true, clazz: "1", str: 6, def: 10, intell: 2, dex: 4 }}, { multi: false });
+          break;
+        case: "2":
+          playersColl.update({ name: name }, {$set: { ready: true, clazz: "2", str: 8, def: 6, intell: 2, dex: 6 }}, { multi: false });
+          break;
+        case: "3":
+          playersColl.update({ name: name }, {$set: { ready: true, clazz: "3", str: 2, def: 4, intell: 10, dex: 6 }}, { multi: false });
+          break;
+        case: "4":
+          playersColl.update({ name: name }, {$set: { ready: true, clazz: "4", str: 2, def: 8, intell: 8, dex: 4 }}, { multi: false });
+          break;
+        case: "5":
+          playersColl.update({ name: name }, {$set: { ready: true, clazz: "5", str: 8, def: 2, intell: 2, dex: 10 }}, { multi: false });
+          break;
+      }
+      return res.send(JSON.stringify([{channel: name, message: "Your character is ready for adventure!"}]));
+    } else {
+      return res.send(JSON.stringify([{channel: name, message: "Your character's class has already been chosen."}]))
     }
   });
 };

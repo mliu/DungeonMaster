@@ -109,7 +109,7 @@ exports.joinGame = function(req, res){
   var gamesColl = db.collection('games');
   var player = playersColl.find({ name: name });
 
-  playersColl.count({ name: name }, function(err, count){
+  playersColl.count({ name: name, ready: true }, function(err, count){
     if(count > 0){
       //Use player in database
       player.toArray(function(err, pArr){
@@ -151,7 +151,13 @@ exports.joinGame = function(req, res){
     } else {
       //Create new player
       console.log("Sending player gen request back");
-      return res.send(JSON.stringify([{channel: req.body.channel, message: "Please create your character before joining. Check PM for more info."}, {channel: req.body.name, message: "To begin character generation, please type .generate"}]));
+      player.toArray(function(err, pArray){
+        if (pArray.length != 0 && pArray[0].ready == false){
+          return res.send(JSON.stringify([{channel: req.body.channel, message: "Please choose your character's class before joining. Check PM for more info."}, {channel: req.body.name, message: "Please choose your character's class: 1: Warrior, 2: Archer, 3: Mage, 4: Cleric, 5: Rogue (e.g. '.choose 3')"}]));
+        } else {
+          return res.send(JSON.stringify([{channel: req.body.channel, message: "Please create your character before joining. Check PM for more info."}, {channel: req.body.name, message: "To begin character generation, please type .generate"}]));
+        }
+      });
     }
   });
 };

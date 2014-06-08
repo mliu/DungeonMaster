@@ -32,7 +32,7 @@ app.listen(3000);
 console.log('Listening on port 3000');
 
 //Identifying function
-checkIdentified = function(name, callback){
+checkIdentified = function(name, checkback, callback){
   console.log("identifying " + name);
   request.get(
     path + '/players/identify',
@@ -41,9 +41,13 @@ checkIdentified = function(name, callback){
       if(!error && response.statusCode == 200){
         if(body == "true"){
           callback();
-        } else {
+        } else if(!checkback) {
           dm.say(name, "Before executing sensitive commands, I need to identify " + name + " first...")
           dm.say("nickserv", "acc " + name);
+          //Hopefully nickserv responds within 2 seconds
+          setTimeout(function(){
+            checkIdentified(name, true, callback);
+          }, 2000);
         }
       }
     }
@@ -87,7 +91,7 @@ dm.addListener('message', function(from, to, message){
 
   //Choose player class
   else if(message.indexOf('.choose ') == 0){
-    checkIdentified(from, function(){
+    checkIdentified(from, false, function(){
       if(chooseResponse.indexOf(message[message.length-1]) > -1){
         request.post(
           path + '/players/choose',
@@ -108,7 +112,7 @@ dm.addListener('message', function(from, to, message){
   //Sensitive functions that need identification to execute
   //Listen for delete character
   else if(message.indexOf('.delete') == 0){
-    checkIdentified(from, function(){
+    checkIdentified(from, false, function(){
       console.log("deleting " + from);
       request.post(
         path + '/players/delete',
@@ -128,7 +132,7 @@ dm.addListener('message', function(from, to, message){
 
   //Listen for game starts
   else if(to == ch && message.indexOf('.adventure') == 0){
-    checkIdentified(from, function(){
+    checkIdentified(from, false, function(){
       console.log(from + " join/start adventure")
       request.post(
         path + '/games',

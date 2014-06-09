@@ -1,6 +1,6 @@
 //Vars
 var db = require('./dm.js').db;
-require('./character.js')
+require('./character.js');
 
 exports.identifyPlayer = function(req, res){
   var name = req.body.name;
@@ -128,7 +128,7 @@ exports.joinGame = function(req, res){
               //insert player into database
               console.log("Creating new adventure");
               gpColl.insert({ player: playerId, game: obj[0]._id });
-              return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark when 4 more join! Anyone wishing to join type .adventure"}]));
+              return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark when 4 more join! Anyone wishing to join type .adventure", success: true}]));
             });
           }
         });

@@ -1,5 +1,6 @@
 //Vars
 var db = require('./dm.js').db;
+require('./character.js')
 
 exports.identifyPlayer = function(req, res){
   var name = req.body.name;

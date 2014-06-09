@@ -18,7 +18,7 @@ function Adventure(){
     var gmRouting = db.collection('gmRouting');
     var game = gamesColl.find({}).sort({_id:-1}).toArray()[0];
     //Generate boss
-
+    monsterColl.insert({ boss:  })
 
     //Generate adventure embark dialog
     games.toArray(function(err, arr){

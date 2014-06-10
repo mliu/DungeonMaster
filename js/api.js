@@ -1,7 +1,6 @@
 //Vars
 var db = require('./dm.js').db;
 require('./character.js');
->>>>>>> 98fda2d3e22b9e9ebf6c5bdda4b617d1693ee999
 
 exports.identifyPlayer = function(req, res){
   var name = req.body.name;

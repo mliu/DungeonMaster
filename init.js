@@ -22,9 +22,9 @@ var server = new Server('localhost', 27017, {auto_reconnect: true});
 console.log("Setup game database");
 db = new Db('dmdb', server);
 
+console.log("Connected to 'dmdb' database");
 db.open(function(err, db){
   if(!err){
-    console.log("Connected to 'dmdb' database");
     console.log("Connecting to games collection");
     db.collection('games', {strict:true}, function(err, collection){
       if(err){

@@ -1,5 +1,6 @@
 //Vars
 var db = require('./dm.js').db;
+var PARTYMAX = 1;
 
 exports.identifyPlayer = function(req, res){
   var name = req.body.name;
@@ -121,7 +122,7 @@ exports.joinGame = function(req, res){
             //Insert player into database
             //Check if party is full or not
             gpColl.count({ game: arr[0]._id }, function(err, party){
-              if(party == 5){
+              if(party == PARTYMAX){
                 return res.send(JSON.stringify([{channel: req.body.channel, message: "This adventure is full! :("}]));
               } else {
                 gpColl.count({ player: playerId, game: arr[0]._id }, function(err, num){
@@ -132,7 +133,13 @@ exports.joinGame = function(req, res){
                   else{
                     console.log("adding " + name + " to adventure");
                     gpColl.insert({ player: playerId, game: arr[0]._id });
-                    return res.send(JSON.stringify([{channel: req.body.channel, message: name + " rises for the adventure!"}]));
+                    gpColl.count({ game: arr[0]._id }, function(err, party2){
+                      if(party2 == PARTYMAX){
+                        return res.send(JSON.stringify([{channel: req.body.channel, message: name + " rises for the adventure!"}, {channel: req.body.channel, message: "Eager to head out, our " + PARTYMAX + " bold adventurers set out for mysterious lands!"}]));
+                      } else {
+                        return res.send(JSON.stringify([{channel: req.body.channel, message: name + " rises for the adventure!"}]));
+                      }
+                    });
                   }
                 });
               }

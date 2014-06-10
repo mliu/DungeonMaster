@@ -1,4 +1,5 @@
 require('./func.js');
+require('./adventure.js');
 
 //Vars for simplicity
 console.log("Setting up vars");
@@ -15,6 +16,7 @@ var accResponse = ["0", "1", "2"];
 var chooseResponse = ["1", "2", "3", "4"];
 //API setup
 module.exports.db = db;
+module.exports.PARTYMAX = 5;
 var api = require('./api.js');
 
 //Route api calls
@@ -142,6 +144,10 @@ dm.addListener('message', function(from, to, message){
           if(!error && response.statusCode == 200){
             forEach(body, function(obj){
               dm.say(obj.channel, obj.message);
+              //Adventure started
+              if(obj.success == "true"){
+
+              }
             });
           }
         }

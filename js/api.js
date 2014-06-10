@@ -1,6 +1,7 @@
 //Vars
 var db = require('./dm.js').db;
-var PARTYMAX = 1;
+require('./character.js');
+>>>>>>> 98fda2d3e22b9e9ebf6c5bdda4b617d1693ee999
 
 exports.identifyPlayer = function(req, res){
   var name = req.body.name;
@@ -61,23 +62,7 @@ exports.choosePlayerClass = function(req, res){
       return res.send(JSON.stringify([{channel: name, message: "No character found!"}]));
     }
     else if(arr[0].ready == false) {
-      switch(clazz){
-        case "1":
-          playersColl.update({ name: name }, {$set: { ready: true, clazz: "1", str: 6, def: 10, intell: 2, dex: 4 }}, { multi: false });
-          break;
-        case "2":
-          playersColl.update({ name: name }, {$set: { ready: true, clazz: "2", str: 8, def: 6, intell: 2, dex: 6 }}, { multi: false });
-          break;
-        case "3":
-          playersColl.update({ name: name }, {$set: { ready: true, clazz: "3", str: 2, def: 4, intell: 10, dex: 6 }}, { multi: false });
-          break;
-        case "4":
-          playersColl.update({ name: name }, {$set: { ready: true, clazz: "4", str: 2, def: 8, intell: 8, dex: 4 }}, { multi: false });
-          break;
-        case "5":
-          playersColl.update({ name: name }, {$set: { ready: true, clazz: "5", str: 8, def: 2, intell: 2, dex: 10 }}, { multi: false });
-          break;
-      }
+      playersColl.update({ name: name }, { $set: character: Character(clazz) }, { multi: false }));
       return res.send(JSON.stringify([{channel: name, message: "Your character is ready for adventure!"}]));
     } else {
       return res.send(JSON.stringify([{channel: name, message: "Your character's class has already been chosen."}]))
@@ -150,7 +135,7 @@ exports.joinGame = function(req, res){
               //insert player into database
               console.log("Creating new adventure");
               gpColl.insert({ player: playerId, game: obj[0]._id });
-              return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark when 4 more join! Anyone wishing to join type .adventure"}]));
+              return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark when 4 more join! Anyone wishing to join type .adventure", success: true}]));
             });
           }
         });

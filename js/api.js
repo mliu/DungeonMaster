@@ -1,5 +1,7 @@
 //Vars
-var db = require('./dm.js').db;
+var dm = require('./dm.js');
+var db = dm.db;
+var PARTYMAX = dm.PARTYMAX;
 require('./character.js');
 
 exports.identifyPlayer = function(req, res){
@@ -119,7 +121,7 @@ exports.joinGame = function(req, res){
                     gpColl.insert({ player: playerId, game: arr[0]._id });
                     gpColl.count({ game: arr[0]._id }, function(err, party2){
                       if(party2 == PARTYMAX){
-                        return res.send(JSON.stringify([{channel: req.body.channel, message: name + " rises for the adventure!"}, {channel: req.body.channel, message: "Eager to head out, our " + PARTYMAX + " bold adventurers set out for mysterious lands!"}]));
+                        return res.send(JSON.stringify([{channel: req.body.channel, message: name + " rises for the adventure!"}, {channel: req.body.channel, message: "Eager to begin, our " + PARTYMAX + " bold adventurers set out for mysterious lands!", success: true }]));
                       } else {
                         return res.send(JSON.stringify([{channel: req.body.channel, message: name + " rises for the adventure!"}]));
                       }
@@ -134,7 +136,7 @@ exports.joinGame = function(req, res){
               //insert player into database
               console.log("Creating new adventure");
               gpColl.insert({ player: playerId, game: obj[0]._id });
-              return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark when 4 more join! Anyone wishing to join type .adventure", success: true}]));
+              return res.send(JSON.stringify([{channel: req.body.channel, message: name + " has decided to lead an adventure, which will embark when 4 more join! Anyone wishing to join type .adventure"}]));
             });
           }
         });

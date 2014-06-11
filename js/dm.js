@@ -14,6 +14,7 @@ var chListener = 'message' + ch;
 var path = config.host + ":" + config.port;
 var accResponse = ["0", "1", "2"];
 var chooseResponse = ["1", "2", "3", "4"];
+var adventure = Adventure();;
 //API setup
 module.exports.db = db;
 module.exports.PARTYMAX = 5;
@@ -146,7 +147,10 @@ dm.addListener('message', function(from, to, message){
               dm.say(obj.channel, obj.message);
               //Adventure started
               if(obj.success == "true"){
-
+                var dialog = adventure.startAdventure(obj.channel);
+                forEach(dialog, function(obj2){
+                  dm.say(obj2.channel, obj2.message);
+                });
               }
             });
           }

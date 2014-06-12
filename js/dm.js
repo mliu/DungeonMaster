@@ -17,7 +17,6 @@ var chooseResponse = ["1", "2", "3", "4"];
 var adventure = Adventure();
 //API setup
 module.exports.db = db;
-module.exports.PARTYMAX = 5;
 var api = require('./api.js');
 
 //Route api calls
@@ -146,8 +145,11 @@ dm.addListener('message', function(from, to, message){
             forEach(body, function(obj){
               dm.say(obj.channel, obj.message);
               //Adventure started
-              if(obj.success == "true"){
+              console.log(obj.success);
+              if(obj.success == true){
+                console.log("a");
                 var dialog = adventure.startAdventure(obj.channel);
+                console.log(dialog);
                 forEach(dialog, function(obj2){
                   dm.say(obj2.channel, obj2.message);
                 });
@@ -174,7 +176,7 @@ dm.addListener('notice', function(nick, to, text, message){
         });
       }
     );
-  } else if(nick == "NickServ" && accResponse.indexOf(text[text.length-1]) > -1){
+  } else if(nick == "NickServ" && /\d/.test(text)){
     dm.say(text.substr(0, text.indexOf(" ")), "You are not identified with the Nickserv.");
   }
 });

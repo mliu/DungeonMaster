@@ -1,4 +1,4 @@
-function Character(clazz) {
+Character = function (clazz) {
   this.level = 1;
   this.exp = 0;
   this.gold = 0;

@@ -12,6 +12,7 @@ Adventure = function(){
   this.boss = null;
 
   function startAdventure(channel){
+    console.log("start adventure");
     var gpColl = db.collection('gpRouting');
     var gamesColl = db.collection('games');
     var monsterColl = db.collection('monsters');

@@ -1,7 +1,7 @@
-require('./constants.js');
+var constants = require('./constants.js');
 
 function Boss(){
-  this.name = MONSTER_NAME[Math.floor(Math.random()*MONSTER_NAME.length)];
-  this.legend = this.name + ", " + MONSTER_DESCRIBE[Math.floor(Math.random()*MONSTER_DESCRIBE.length)] + " of " + MONSTER_VICTIM[Math.floor(Math.random()*MONSTER_VICTIM.length)];
+  this.name = constants.MONSTER_NAME[Math.floor(Math.random()*constants.MONSTER_NAME.length)];
+  this.legend = this.name + ", " + constants.MONSTER_DESCRIBE[Math.floor(Math.random()*constants.MONSTER_DESCRIBE.length)] + " of " + constants.MONSTER_VICTIM[Math.floor(Math.random()*constants.MONSTER_VICTIM.length)];
   this.level = 1;
 }

@@ -63,7 +63,7 @@ exports.choosePlayerClass = function(req, res){
       return res.send(JSON.stringify([{channel: name, message: "No character found!"}]));
     }
     else if(arr[0].ready == false) {
-      playersColl.update({ name: name }, { $set: character: Character(clazz) }, { multi: false }));
+      playersColl.update({ name: name }, { $set: { character: Character(clazz) } }, { multi: false });
       return res.send(JSON.stringify([{channel: name, message: "Your character is ready for adventure!"}]));
     } else {
       return res.send(JSON.stringify([{channel: name, message: "Your character's class has already been chosen."}]))

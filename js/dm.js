@@ -14,7 +14,7 @@ var chListener = 'message' + ch;
 var path = config.host + ":" + config.port;
 var accResponse = ["0", "1", "2"];
 var chooseResponse = ["1", "2", "3", "4"];
-var adventure = Adventure();;
+var adventure = Adventure();
 //API setup
 module.exports.db = db;
 module.exports.PARTYMAX = 5;

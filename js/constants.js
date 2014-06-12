@@ -1,5 +1,5 @@
 var MONSTER_NAME = [
-  "BANE"
+  "BANE",
   "CRUUL",
   "FLINT",
   "KEVIN",
@@ -28,3 +28,8 @@ var MONSTER_TYPE = [
   { single: "Werewolf", multi: "Werewolves", group: "pack" },
   { single: "Cyclops", multi: "Cyclops", group: "group"}
 ];
+
+module.exports.MONSTER_NAME = MONSTER_NAME;
+module.exports.MONSTER_DESCRIBE = MONSTER_DESCRIBE;
+module.exports.MONSTER_VICTIM = MONSTER_VICTIM;
+module.exports.MONSTER_TYPE = MONSTER_TYPE;

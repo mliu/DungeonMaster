@@ -3,9 +3,9 @@ var db = dm.db;
 var PARTYMAX = dm.PARTYMAX;
 require('./character.js');
 require('./boss.js');
-require('./monster.js');
+// require('./monster.js');
 
-function Adventure(){
+Adventure = function(){
   //Default playercount to max party size
   this.playerCount = PARTYMAX;
   this.game = null;

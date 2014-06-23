@@ -1,11 +1,12 @@
 var dm = require('./dm.js');
+var constants = require('./constants.js');
 var db = dm.db;
-var PARTYMAX = dm.PARTYMAX;
+var PARTYMAX = constants.PARTYMAX;
 require('./character.js');
 require('./boss.js');
 // require('./monster.js');
 
-Adventure = function(){
+Adventure = function () {
   //Default playercount to max party size
   this.playerCount = PARTYMAX;
   this.game = null;
@@ -18,14 +19,19 @@ Adventure.prototype.startAdventure = function (channel) {
   var gamesColl = db.collection('games');
   var monsterColl = db.collection('monsters');
   var gmRouting = db.collection('gmRouting');
-  var game = gamesColl.find({}).sort({_id:-1}).toArray()[0];
-  this.game = game;
+  gamesColl.find({}).sort({_id:-1}).toArray(function(err, arr){
+    this.game = arr[0];
+  }, this);
   //Generate boss
-  monsterColl.insert({ boss: Boss() }, {w: 1}, function(err, obj){
-    gmRouting.insert({ game: game._id, monster: obj._id });
-    this.boss = boss;
-  });
+  this.boss = new Boss();
+  monsterColl.insert({ boss: this.boss }, {w: 1}, function(err, obj){
+    gmRouting.insert({ game: this.game._id, monster: obj._id });
+  }, this);
   //TODO: Generate location nodes
   //Generate adventure embark dialog
-  return JSON.stringify[{ channel: channel, message: "QUEST: Seek out and kill " + boss.legend }];
+  return JSON.stringify[{ channel: channel, message: 'QUEST: Seek out and kill ' + this.boss.legend }];
+}
+
+Adventure.prototype.genEvent = function () {
+
 }

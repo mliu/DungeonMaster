@@ -1,5 +1,7 @@
 var PARTYMAX = 1;
 
+var MAPSIZE = 5;
+
 var MONSTER_NAME = [
   "BANE",
   "CRUUL",

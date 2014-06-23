@@ -1,5 +1,4 @@
 require('./func.js');
-require('./adventure.js');
 
 //Vars for simplicity
 console.log("Setting up vars");
@@ -14,10 +13,13 @@ var chListener = 'message' + ch;
 var path = config.host + ":" + config.port;
 var accResponse = ["0", "1", "2"];
 var chooseResponse = ["1", "2", "3", "4"];
-var adventure = Adventure();
+
 //API setup
 module.exports.db = db;
+require('./adventure.js');
 var api = require('./api.js');
+
+var adventure = new Adventure();
 
 //Route api calls
 //Games
@@ -147,7 +149,6 @@ dm.addListener('message', function(from, to, message){
               //Adventure started
               console.log(obj.success);
               if(obj.success == true){
-                console.log("a");
                 var dialog = adventure.startAdventure(obj.channel);
                 console.log(dialog);
                 forEach(dialog, function(obj2){

@@ -64,6 +64,16 @@ db.open(function(err, db){
       }
     });
 
+    console.log("Connecting to maps collection");
+    db.collection('maps', {strict:true}, function(err, collection){
+      if(err){
+        console.log("No 'maps' collection. Creating empty collection");
+        db.collection('maps', function(err, collection){
+          collection.insert([], {safe:true}, function(err, result) {});
+        });
+      }
+    });
+
     console.log("Connecting to monsters collection");
     db.collection('monsters', {strict:true}, function(err, collection){
       if(err){

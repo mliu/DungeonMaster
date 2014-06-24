@@ -7,7 +7,8 @@ var MONSTER_NAME = [
   "CRUUL",
   "FLINT",
   "KEVIN",
-  "NAXX"
+  "NAXX",
+  "MANCE"
 ];
 
 var MONSTER_DESCRIBE = [
@@ -15,7 +16,8 @@ var MONSTER_DESCRIBE = [
   "destroyer",
   "conqueror",
   "eater",
-  "slayer"
+  "slayer",
+  "gobbler"
 ];
 
 var MONSTER_VICTIM = [
@@ -23,7 +25,8 @@ var MONSTER_VICTIM = [
   "villages",
   "kingdoms",
   "crops",
-  "pets"
+  "pets",
+  "souls"
 ];
 
 var MONSTER_TYPE = [

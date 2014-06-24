@@ -13,7 +13,7 @@ Adventure = function () {
   this.boss = null;
 }
 
-Adventure.prototype.startAdventure = function (channel) {
+Adventure.prototype.startAdventure = function (channel, callback) {
   console.log("start adventure");
   var gpColl = db.collection('gpRouting');
   var gamesColl = db.collection('games');
@@ -21,15 +21,15 @@ Adventure.prototype.startAdventure = function (channel) {
   var gmRouting = db.collection('gmRouting');
   gamesColl.find({}).sort({_id:-1}).toArray(function(err, arr){
     this.game = arr[0];
+    //Generate boss
+    this.boss = new Boss();
+    monsterColl.insert({ boss: this.boss }, {w: 1}, function(err, obj){
+      gmRouting.insert({ game: this.game._id, monster: obj._id });
+      //TODO: Generate location nodes
+      //Generate adventure embark dialog
+      callback(JSON.stringify([{ channel: channel, message: 'QUEST: Seek out and kill ' + this.boss.legend }], this));
+    }, this);
   }, this);
-  //Generate boss
-  this.boss = new Boss();
-  monsterColl.insert({ boss: this.boss }, {w: 1}, function(err, obj){
-    gmRouting.insert({ game: this.game._id, monster: obj._id });
-  }, this);
-  //TODO: Generate location nodes
-  //Generate adventure embark dialog
-  return JSON.stringify[{ channel: channel, message: 'QUEST: Seek out and kill ' + this.boss.legend }];
 }
 
 Adventure.prototype.genEvent = function () {

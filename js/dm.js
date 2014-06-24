@@ -12,7 +12,6 @@ var ch = config.options.channels[0];
 var chListener = 'message' + ch;
 var path = config.host + ":" + config.port;
 var accResponse = ["0", "1", "2"];
-var chooseResponse = ["1", "2", "3", "4"];
 
 //API setup
 module.exports.db = db;
@@ -96,20 +95,18 @@ dm.addListener('message', function(from, to, message){
   //Choose player class
   else if(message.indexOf('.choose ') == 0){
     checkIdentified(from, false, function(){
-      if(chooseResponse.indexOf(message[message.length-1]) > -1){
-        request.post(
-          path + '/players/choose',
-          { form: { name: from, clazz: message[message.length-1] }},
-          function(error, response, body){
-            console.log("response received /players/choose");
-            if(!error && response.statusCode == 200){
-              forEach(body, function(obj){
-                dm.say(obj.channel, obj.message);
-              });
-            }
+      request.post(
+        path + '/players/choose',
+        { form: { name: from, clazz: message.substr(message.indexOf(" ") + 1) }},
+        function(error, response, body){
+          console.log("response received /players/choose");
+          if(!error && response.statusCode == 200){
+            forEach(body, function(obj){
+              dm.say(obj.channel, obj.message);
+            });
           }
-        );
-      }
+        }
+      );
     });
   }
 
@@ -147,12 +144,11 @@ dm.addListener('message', function(from, to, message){
             forEach(body, function(obj){
               dm.say(obj.channel, obj.message);
               //Adventure started
-              console.log(obj.success);
               if(obj.success == true){
-                var dialog = adventure.startAdventure(obj.channel);
-                console.log(dialog);
-                forEach(dialog, function(obj2){
-                  dm.say(obj2.channel, obj2.message);
+                adventure.startAdventure(obj.channel, function(res){
+                  forEach(res, function(obj2){
+                    dm.say(obj2.channel, obj2.message);
+                  });
                 });
               }
             });

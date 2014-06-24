@@ -5,3 +5,7 @@ Boss = function () {
   this.legend = this.name + ', ' + constants.MONSTER_DESCRIBE[Math.floor(Math.random()*constants.MONSTER_DESCRIBE.length)] + ' of ' + constants.MONSTER_VICTIM[Math.floor(Math.random()*constants.MONSTER_VICTIM.length)];
   this.level = 1;
 }
+
+Boss.prototype.getLegend = function () {
+  return this.legend;
+}

@@ -2,6 +2,7 @@
 var dm = require('./dm.js');
 var db = dm.db;
 var PARTYMAX = require('./constants.js').PARTYMAX;
+var DEBUG = require('./constants.js').DEBUG;
 var CHOOSERESPONSE = ["1", "2", "3", "4", "5"];
 require('./character.js');
 
@@ -22,7 +23,7 @@ exports.playerIdentified = function(req, res){
   var playersColl = db.collection('players');
   var player = playersColl.find({ name: name }).limit(1);
   player.count(function(err, count){
-    if(count == 0){
+    if(count == 0 || DEBUG){
       return res.send(true);
     } else {
       player.toArray(function(err, arr){
@@ -103,7 +104,8 @@ exports.joinGame = function(req, res){
       //Use player in database
       player.toArray(function(err, pArr){
         playerId = pArr[0]._id;
-        var recentGames = gamesColl.find({}).sort({_id:-1});
+        var recentGames = gamesColl.find().sort({_id:-1});
+        console.log(recentGames);
         recentGames.toArray(function(err, arr){
           //If there is an active game waiting for joins
           if(arr.length > 0 && arr[0].active){

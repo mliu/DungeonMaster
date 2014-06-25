@@ -1,5 +1,7 @@
 var PARTYMAX = 1;
 
+var DEBUG = true;
+
 var MAPSIZE = 5;
 
 var MONSTER_NAME = [
@@ -37,6 +39,8 @@ var MONSTER_TYPE = [
 ];
 
 module.exports.PARTYMAX = PARTYMAX;
+module.exports.DEBUG = DEBUG;
+module.exports.MAPSIZE = MAPSIZE;
 module.exports.MONSTER_NAME = MONSTER_NAME;
 module.exports.MONSTER_DESCRIBE = MONSTER_DESCRIBE;
 module.exports.MONSTER_VICTIM = MONSTER_VICTIM;
